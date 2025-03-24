@@ -1,0 +1,60 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js pipeline
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Use Node.js 
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: install dependences
+      run: npm install
+
+    - name: Run tests
+      run: npm test
+
+  deploy: 
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout code
+      uses: actions/checkout@v3
+
+    - name: use Node.js
+      uses: action/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: install dependencies
+      run: npm install
+
+    - name: Deploy Application
+      run: echo"deploying application..."
+    - name: Deploy to ec2
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          cd /home/ubuntu/nodejs-app
+          git pull origin main
+          npm install
+          pm2 restart all
+
