@@ -5,7 +5,7 @@ app.get('/', (req, res) => {
     res.status(200).send(`
         <html>
             <head>
-                <title>Cool Welcome to Website!</title>
+                <title>Welcome to github-action Website!</title>
                 <style>
                     body {
                         font-family: Arial, sans-serif;
